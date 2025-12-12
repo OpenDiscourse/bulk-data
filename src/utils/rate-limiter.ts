@@ -10,7 +10,7 @@ export class TokenBucketRateLimiter implements RateLimiter {
     this.maxTokens = requestsPerHour;
     this.tokens = requestsPerHour;
     this.lastRefill = Date.now();
-    // Refill rate: requestsPerHour tokens over 1 hour (3600000 ms)
+    // Refill rate: tokens per millisecond (requestsPerHour tokens over 3600000 ms)
     this.refillRate = requestsPerHour / 3600000;
   }
 

@@ -41,6 +41,10 @@ const BulkIngestCollectionSchema = z.object({
   useWorkers: z.boolean().default(true)
 });
 
+const GetIngestionStatsSchema = z.object({
+  endpoint: z.string().optional()
+});
+
 export function createGovinfoTools(
   client: GovinfoAPIClient,
   bulkClient: GovinfoBulkDataClient,
@@ -417,7 +421,8 @@ export function createGovinfoTools(
         }
       },
       handler: async (params: any) => {
-        const stats = await tracker.getIngestionStats(params?.endpoint);
+        const validated = GetIngestionStatsSchema.parse(params);
+        const stats = await tracker.getIngestionStats(validated.endpoint);
 
         return {
           content: [{

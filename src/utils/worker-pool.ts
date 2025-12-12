@@ -17,10 +17,10 @@ export class WorkerPool {
       } finally {
         this.activeTasks.delete(task.id);
       }
-    }, { priority: task.priority });
+    }, { priority: task.priority }) as Promise<T>;
 
     this.activeTasks.set(task.id, taskPromise);
-    return taskPromise as Promise<T>;
+    return taskPromise;
   }
 
   async waitForAll(): Promise<void> {

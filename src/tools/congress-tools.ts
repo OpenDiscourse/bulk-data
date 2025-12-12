@@ -23,6 +23,32 @@ const BulkIngestBillsSchema = z.object({
   useWorkers: z.boolean().default(true)
 });
 
+const ListAmendmentsSchema = z.object({
+  congress: z.number().optional(),
+  amendmentType: z.string().optional(),
+  offset: z.number().default(0),
+  limit: z.number().max(250).default(250)
+});
+
+const ListLawsSchema = z.object({
+  congress: z.number().optional(),
+  lawType: z.string().optional(),
+  offset: z.number().default(0),
+  limit: z.number().max(250).default(250)
+});
+
+const ListCommitteesSchema = z.object({
+  chamber: z.enum(['house', 'senate']).optional(),
+  offset: z.number().default(0),
+  limit: z.number().max(250).default(250)
+});
+
+const ListMembersSchema = z.object({
+  congress: z.number().optional(),
+  offset: z.number().default(0),
+  limit: z.number().max(250).default(250)
+});
+
 export function createCongressTools(
   client: CongressAPIClient,
   tracker: IngestionTracker,
@@ -278,7 +304,8 @@ export function createCongressTools(
         }
       },
       handler: async (params: any) => {
-        const response = await client.listAmendments(params);
+        const validated = ListAmendmentsSchema.parse(params);
+        const response = await client.listAmendments(validated);
         return {
           content: [{
             type: 'text',
@@ -315,7 +342,8 @@ export function createCongressTools(
         }
       },
       handler: async (params: any) => {
-        const response = await client.listLaws(params);
+        const validated = ListLawsSchema.parse(params);
+        const response = await client.listLaws(validated);
         return {
           content: [{
             type: 'text',
@@ -349,7 +377,8 @@ export function createCongressTools(
         }
       },
       handler: async (params: any) => {
-        const response = await client.listCommittees(params);
+        const validated = ListCommitteesSchema.parse(params);
+        const response = await client.listCommittees(validated);
         return {
           content: [{
             type: 'text',
@@ -382,7 +411,8 @@ export function createCongressTools(
         }
       },
       handler: async (params: any) => {
-        const response = await client.listMembers(params);
+        const validated = ListMembersSchema.parse(params);
+        const response = await client.listMembers(validated);
         return {
           content: [{
             type: 'text',
