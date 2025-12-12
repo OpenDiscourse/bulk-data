@@ -12,7 +12,7 @@ from typing import Callable, List, Dict, Any, Optional, Tuple
 from queue import Queue, Empty
 from threading import Lock
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +28,7 @@ class Task:
     priority: int = 0
     retry_count: int = 0
     max_retries: int = 3
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 @dataclass

@@ -9,7 +9,7 @@ import json
 import sqlite3
 import hashlib
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Set, Any
 from threading import Lock
 from pathlib import Path
@@ -106,7 +106,7 @@ class SQLiteDataTracker(DataTracker):
             item_hash = hashlib.sha256(item_id.encode()).hexdigest()
             
             metadata_json = json.dumps(metadata) if metadata else None
-            timestamp = datetime.utcnow().isoformat()
+            timestamp = datetime.now(timezone.utc).isoformat()
             
             with sqlite3.connect(self.db_path) as conn:
                 try:

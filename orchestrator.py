@@ -10,7 +10,7 @@ import json
 import logging
 from typing import Dict, List, Optional, Any
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 from api_client import CongressAPIClient, GovInfoAPIClient, BulkDataClient
 from rate_limiter import RateLimiterManager
@@ -159,7 +159,7 @@ class DataIngestionOrchestrator:
                 json.dump(bill_data, f, indent=2)
             
             # Mark as processed
-            tracker.add_item(bill_id, {"processed_at": datetime.utcnow().isoformat()})
+            tracker.add_item(bill_id, {"processed_at": datetime.now(timezone.utc).isoformat()})
             
             return {"bill_id": bill_id, "saved_to": str(output_file)}
         
@@ -234,7 +234,7 @@ class DataIngestionOrchestrator:
                 json.dump(package_data, f, indent=2)
             
             # Mark as processed
-            tracker.add_item(package_id, {"processed_at": datetime.utcnow().isoformat()})
+            tracker.add_item(package_id, {"processed_at": datetime.now(timezone.utc).isoformat()})
             
             return {"package_id": package_id, "saved_to": str(output_file)}
         
@@ -324,7 +324,7 @@ class DataIngestionOrchestrator:
             if success:
                 # Mark as processed
                 tracker.add_item(file_url, {
-                    "downloaded_at": datetime.utcnow().isoformat(),
+                    "downloaded_at": datetime.now(timezone.utc).isoformat(),
                     "local_path": str(output_file)
                 })
                 return {"file_url": file_url, "saved_to": str(output_file)}
