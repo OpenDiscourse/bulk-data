@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { join } from 'path';
+import { dirname } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 
 /**
@@ -48,8 +48,8 @@ export class StorageManager {
 
   constructor(dbPath: string = './data/ingestion.db') {
     // Ensure directory exists
-    const dir = join(process.cwd(), 'data');
-    if (!existsSync(dir)) {
+    const dir = dirname(dbPath);
+    if (dir && dir !== '.' && !existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
 

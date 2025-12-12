@@ -30,6 +30,7 @@ export class WorkerPool {
   private congressClient?: CongressApiClient;
   private govinfoClient?: GovInfoApiClient;
   private activeTasks: Map<string, Task>;
+  private completedTasks: number;
 
   constructor(
     config: WorkerConfig,
@@ -45,6 +46,7 @@ export class WorkerPool {
     this.congressClient = congressClient;
     this.govinfoClient = govinfoClient;
     this.activeTasks = new Map();
+    this.completedTasks = 0;
   }
 
   /**
@@ -104,6 +106,7 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
+        this.completedTasks++;
       } catch (error: any) {
         console.error(`Worker ${workerId} error:`, error);
         
@@ -118,6 +121,7 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
+        this.completedTasks++;
         throw error;
       }
     });
@@ -180,6 +184,7 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
+        this.completedTasks++;
       } catch (error: any) {
         console.error(`Worker ${workerId} error:`, error);
         
@@ -194,6 +199,7 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
+        this.completedTasks++;
         throw error;
       }
     });
@@ -256,6 +262,7 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
+        this.completedTasks++;
       } catch (error: any) {
         console.error(`Worker ${workerId} error:`, error);
         
@@ -270,6 +277,7 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
+        this.completedTasks++;
         throw error;
       }
     });
@@ -295,7 +303,7 @@ export class WorkerPool {
     return {
       pending: this.queue.pending,
       active: this.activeTasks.size,
-      completed: 0, // Could track this separately if needed
+      completed: this.completedTasks,
     };
   }
 

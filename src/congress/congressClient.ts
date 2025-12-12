@@ -205,7 +205,24 @@ export class CongressApiClient {
 
         // Process each item
         for (const item of items) {
-          const packageId = item.number || item.bioguideId || item.recordId || item.url;
+          // Generate unique package ID based on item type
+          let packageId: string;
+          if (item.number && item.congress) {
+            // Bills, amendments, etc.
+            packageId = `${endpoint}-${item.congress}-${item.number}`;
+          } else if (item.bioguideId) {
+            // Members
+            packageId = `member-${item.bioguideId}`;
+          } else if (item.recordId) {
+            // Records
+            packageId = `record-${item.recordId}`;
+          } else if (item.url) {
+            // Fallback to hashing the URL for uniqueness
+            packageId = `url-${Buffer.from(item.url).toString('base64').substring(0, 32)}`;
+          } else {
+            // Last resort: use item index with timestamp
+            packageId = `${endpoint}-${offset + items.indexOf(item)}-${Date.now()}`;
+          }
           
           if (!this.storage.isIngested('congress', packageId)) {
             this.storage.recordIngestion({
