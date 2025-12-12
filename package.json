@@ -1,0 +1,33 @@
+{
+  "name": "@opendiscourse/bulk-data-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for ingesting bulk data from api.congress.gov and govinfo.gov",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "congress",
+    "govinfo",
+    "bulk-data",
+    "api"
+  ],
+  "author": "OpenDiscourse",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "better-sqlite3": "^11.7.0",
+    "p-queue": "^8.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
