@@ -718,7 +718,7 @@ class BulkDataMCPServer {
     };
   }
 
-  private async cleanup(): void {
+  private async cleanup(): Promise<void> {
     console.log('Cleaning up...');
     storage.close();
   }
