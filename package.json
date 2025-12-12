@@ -1,0 +1,27 @@
+{
+  "name": "bulk-data",
+  "version": "1.0.0",
+  "description": "GPO provides the capability to download XML in bulk for select collections from https://www.govinfo.gov/bulkdata.",
+  "main": "dist/index.js",
+  "bin": {
+    "bulk-data-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.0.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "axios": "^1.13.2"
+  }
+}
