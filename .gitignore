@@ -15,6 +15,7 @@ build/
 *.js
 *.d.ts
 !jest.config.js
+!test-*.js
 
 # Environment variables
 .env
