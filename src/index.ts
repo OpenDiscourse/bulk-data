@@ -148,12 +148,18 @@ class BulkDataMCPServer {
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        let message = "Unknown error";
+        if (typeof error === "object" && error !== null && "message" in error && typeof (error as any).message === "string") {
+          message = (error as any).message;
+        } else if (typeof error === "string") {
+          message = error;
+        }
         return {
           content: [
             {
               type: 'text',
-              text: `Error: ${error.message}`,
+              text: `Error: ${message}`,
             },
           ],
           isError: true,
