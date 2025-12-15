@@ -277,7 +277,6 @@ export class WorkerPool {
         });
 
         this.activeTasks.delete(taskId);
-        this.completedTasks++;
         throw error;
       }
     });
