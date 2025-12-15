@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { congressRateLimiter, extractRateLimitInfo, calculateDelay } from '../utils/rateLimiter.js';
 import { StorageManager } from '../storage/storageManager.js';
 
