@@ -60,15 +60,15 @@ export class CongressApiClient {
     params: Record<string, any> = {},
     pagination: PaginationParams = {}
   ): Promise<any> {
-    const { offset = 0, limit = 250 } = pagination;
+    const { offset: pageOffset = 0, limit: pageLimit = 250 } = pagination;
 
     return congressRateLimiter.schedule(async () => {
       try {
         const response = await this.axios.get(`/${endpoint}`, {
           params: {
             ...params,
-            offset,
-            limit: Math.min(limit, 250), // Max 250 per request
+            offset: pageOffset,
+            limit: Math.min(pageLimit, 250), // Max 250 per request
           },
         });
 
@@ -85,8 +85,17 @@ export class CongressApiClient {
         }
 
         return response.data;
-      } catch (error: any) {
-        if (error.response?.status === 429) {
+      } catch (error: unknown) {
+        // Type guard for errors with response property (e.g., AxiosError)
+        if (
+          typeof error === 'object' &&
+          error !== null &&
+          'response' in error &&
+          typeof (error as any).response === 'object' &&
+          (error as any).response !== null &&
+          'status' in (error as any).response &&
+          (error as any).response.status === 429
+        ) {
           console.error('Rate limit exceeded, backing off...');
           await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 1 minute
           throw error;
@@ -220,8 +229,10 @@ export class CongressApiClient {
             // Fallback to hashing the URL for uniqueness
             packageId = `url-${Buffer.from(item.url).toString('base64').substring(0, 32)}`;
           } else {
-            // Last resort: use item index with timestamp
-            packageId = `${endpoint}-${offset + items.indexOf(item)}-${Date.now()}`;
+            // Last resort: use item index combined with stringified item for deterministic hash
+            const itemStr = JSON.stringify(item);
+            const hash = Buffer.from(itemStr).toString('base64').substring(0, 32);
+            packageId = `${endpoint}-${offset + items.indexOf(item)}-${hash}`;
           }
           
           if (!this.storage.isIngested('congress', packageId)) {
