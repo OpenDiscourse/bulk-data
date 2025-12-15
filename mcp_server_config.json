@@ -1,0 +1,176 @@
+{
+  "mcpServers": {
+    "congress-api": {
+      "description": "MCP Server for api.congress.gov API",
+      "baseUrl": "https://api.congress.gov/v3",
+      "rateLimit": {
+        "requestsPerHour": 5000,
+        "requestsPerMinute": 83
+      },
+      "pagination": {
+        "defaultLimit": 20,
+        "maxLimit": 250,
+        "offsetParam": "offset",
+        "limitParam": "limit"
+      },
+      "endpoints": {
+        "bills": {
+          "path": "/bill",
+          "description": "Get bills data",
+          "methods": ["GET"],
+          "pagination": true
+        },
+        "bill": {
+          "path": "/bill/{congress}/{billType}/{billNumber}",
+          "description": "Get specific bill details",
+          "methods": ["GET"],
+          "params": ["congress", "billType", "billNumber"]
+        },
+        "laws": {
+          "path": "/law",
+          "description": "Get laws data",
+          "methods": ["GET"],
+          "pagination": true
+        },
+        "amendments": {
+          "path": "/amendment",
+          "description": "Get amendments data",
+          "methods": ["GET"],
+          "pagination": true
+        },
+        "members": {
+          "path": "/member",
+          "description": "Get members of Congress data",
+          "methods": ["GET"],
+          "pagination": true
+        },
+        "committeeReports": {
+          "path": "/committee-report",
+          "description": "Get committee reports",
+          "methods": ["GET"],
+          "pagination": true
+        },
+        "congressionalRecord": {
+          "path": "/congressional-record",
+          "description": "Get Congressional Record data",
+          "methods": ["GET"],
+          "pagination": true
+        },
+        "nominations": {
+          "path": "/nomination",
+          "description": "Get nominations data",
+          "methods": ["GET"],
+          "pagination": true
+        }
+      }
+    },
+    "govinfo-api": {
+      "description": "MCP Server for api.govinfo.gov API",
+      "baseUrl": "https://api.govinfo.gov",
+      "rateLimit": {
+        "requestsPerHour": 1000,
+        "requestsPerMinute": 16
+      },
+      "pagination": {
+        "defaultLimit": 100,
+        "maxLimit": 1000,
+        "offsetParam": "offset",
+        "limitParam": "pageSize"
+      },
+      "endpoints": {
+        "collections": {
+          "path": "/collections",
+          "description": "List all collections",
+          "methods": ["GET"],
+          "pagination": false
+        },
+        "collectionByDate": {
+          "path": "/collections/{collectionCode}/{startDate}",
+          "description": "Get collection documents by date range",
+          "methods": ["GET"],
+          "params": ["collectionCode", "startDate"],
+          "pagination": true
+        },
+        "packages": {
+          "path": "/packages/{packageId}/summary",
+          "description": "Get package summary",
+          "methods": ["GET"],
+          "params": ["packageId"]
+        },
+        "published": {
+          "path": "/published/{dateIssuedStartDate}",
+          "description": "Get documents by published date",
+          "methods": ["GET"],
+          "params": ["dateIssuedStartDate"],
+          "pagination": true
+        },
+        "search": {
+          "path": "/search",
+          "description": "Search for documents",
+          "methods": ["GET"],
+          "pagination": true
+        }
+      }
+    },
+    "govinfo-bulkdata": {
+      "description": "MCP Server for govinfo.gov/bulkdata",
+      "baseUrl": "https://www.govinfo.gov/bulkdata",
+      "rateLimit": {
+        "requestsPerHour": 1000,
+        "requestsPerMinute": 16
+      },
+      "collections": {
+        "BILLS": {
+          "path": "/BILLS",
+          "description": "Congressional Bills",
+          "formats": ["xml", "json"]
+        },
+        "BILLSTATUS": {
+          "path": "/BILLSTATUS",
+          "description": "Bill Status XML",
+          "formats": ["xml", "json"]
+        },
+        "CFR": {
+          "path": "/CFR",
+          "description": "Code of Federal Regulations",
+          "formats": ["xml", "json"]
+        },
+        "ECFR": {
+          "path": "/ECFR",
+          "description": "Electronic Code of Federal Regulations",
+          "formats": ["xml", "json"]
+        },
+        "FR": {
+          "path": "/FR",
+          "description": "Federal Register",
+          "formats": ["xml", "json"]
+        },
+        "CREC": {
+          "path": "/CREC",
+          "description": "Congressional Record",
+          "formats": ["xml", "json"]
+        },
+        "PLAW": {
+          "path": "/PLAW",
+          "description": "Public and Private Laws",
+          "formats": ["xml", "json"]
+        },
+        "STATUTE": {
+          "path": "/STATUTE",
+          "description": "Statutes at Large",
+          "formats": ["xml", "json"]
+        },
+        "USCOURTS": {
+          "path": "/USCOURTS",
+          "description": "U.S. Courts Opinions",
+          "formats": ["xml", "json"]
+        },
+        "PPP": {
+          "path": "/PPP",
+          "description": "Public Papers of the Presidents",
+          "formats": ["xml", "json"]
+        }
+      }
+    }
+  }
+}
