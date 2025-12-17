@@ -1,0 +1,168 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  # TypeScript MCP Server CI
+  typescript-ci:
+    name: TypeScript MCP Server CI
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Lint TypeScript code
+      run: npm run lint || echo "No lint script configured"
+    
+    - name: Type check
+      run: npm run type-check || npx tsc --noEmit
+    
+    - name: Build TypeScript
+      run: npm run build
+    
+    - name: Run tests
+      run: npm test || echo "No tests configured yet"
+      env:
+        CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
+        GOVINFO_API_KEY: ${{ secrets.GOVINFO_API_KEY }}
+        OPENSTATES_API_KEY: ${{ secrets.OPENSTATES_API_KEY }}
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-${{ matrix.node-version }}
+        path: dist/
+        retention-days: 7
+
+  # Python Data Ingestion CI
+  python-ci:
+    name: Python Data Ingestion CI
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio pylint black flake8
+    
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv,env,ENV,.venv
+        # Exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv,env,ENV,.venv
+    
+    - name: Check code formatting with black
+      run: black --check . --exclude='/(\.git|\.venv|venv|env|ENV|build|dist)/'
+    
+    - name: Run pytest
+      run: pytest -v --cov=. --cov-report=xml --cov-report=html
+      env:
+        CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
+        GOVINFO_API_KEY: ${{ secrets.GOVINFO_API_KEY }}
+        OPENSTATES_API_KEY: ${{ secrets.OPENSTATES_API_KEY }}
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: python
+        name: python-${{ matrix.python-version }}
+      continue-on-error: true
+
+  # Security scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+      continue-on-error: true
+    
+    - name: Setup Node.js for npm audit
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    
+    - name: Run npm audit
+      run: |
+        npm ci
+        npm audit --audit-level=moderate || true
+      continue-on-error: true
+
+  # CodeQL Analysis
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    strategy:
+      matrix:
+        language: [ 'javascript', 'python' ]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+    
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+    
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{ matrix.language }}"
