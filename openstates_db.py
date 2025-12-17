@@ -445,7 +445,7 @@ class OpenStatesDatabase:
                 jurisdiction_id=jurisdiction_id,
                 session_identifier=session_identifier,
                 status='running',
-                metadata=metadata
+                operation_metadata=metadata
             )
             session.add(log)
             session.commit()

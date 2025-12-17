@@ -13,7 +13,23 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.types import TypeDecorator
 import enum
+
+# Use JSON type that works with both PostgreSQL (JSONB) and SQLite (JSON)
+class JSONType(TypeDecorator):
+    """
+    JSON type that uses JSONB for PostgreSQL and JSON for other databases.
+    """
+    impl = JSON
+    cache_ok = True
+    
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'postgresql':
+            return dialect.type_descriptor(JSONB())
+        else:
+            return dialect.type_descriptor(JSON())
+
 
 Base = declarative_base()
 
@@ -149,8 +165,8 @@ class Person(Base):
     current_role = Column(String(255))
     image_url = Column(String(500))
     
-    extras = Column(JSONB)
-    sources = Column(JSONB)
+    extras = Column(JSONType)
+    sources = Column(JSONType)
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -194,17 +210,17 @@ class Bill(Base):
     title = Column(Text, nullable=False)
     classification = Column(String(50), nullable=False)
     
-    subject = Column(JSONB)  # Array of subjects
-    abstracts = Column(JSONB)  # Array of abstracts with notes
+    subject = Column(JSONType)  # Array of subjects
+    abstracts = Column(JSONType)  # Array of abstracts with notes
     
     jurisdiction_id = Column(String(100), ForeignKey("jurisdictions.id"), nullable=False)
     legislative_session_id = Column(Integer, ForeignKey("legislative_sessions.id"), nullable=False)
     
     from_organization = Column(String(100))  # Chamber (upper/lower)
     
-    actions = Column(JSONB)  # Array of action objects
-    extras = Column(JSONB)
-    sources = Column(JSONB)
+    actions = Column(JSONType)  # Array of action objects
+    extras = Column(JSONType)
+    sources = Column(JSONType)
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -282,7 +298,7 @@ class BillVersion(Base):
     
     note = Column(String(500))
     date = Column(DateTime)
-    links = Column(JSONB)  # Array of link objects
+    links = Column(JSONType)  # Array of link objects
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
@@ -313,7 +329,7 @@ class BillDocument(Base):
     
     note = Column(String(500))
     date = Column(DateTime)
-    links = Column(JSONB)  # Array of link objects
+    links = Column(JSONType)  # Array of link objects
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
@@ -355,8 +371,8 @@ class Vote(Base):
     result = Column(String(50), nullable=False)
     
     organization = Column(String(100))  # Chamber
-    counts = Column(JSONB)  # Array of count objects
-    sources = Column(JSONB)
+    counts = Column(JSONType)  # Array of count objects
+    sources = Column(JSONType)
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -430,8 +446,8 @@ class Committee(Base):
     classification = Column(String(100))
     parent_id = Column(String(100), ForeignKey("committees.id"))
     
-    extras = Column(JSONB)
-    sources = Column(JSONB)
+    extras = Column(JSONType)
+    sources = Column(JSONType)
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -460,7 +476,7 @@ class IngestionLog(Base):
         start_time: Operation start time
         end_time: Operation end time
         error_message: Error details if failed
-        metadata: Additional operation metadata (JSONB)
+        operation_metadata: Additional operation metadata (JSONB)
     """
     __tablename__ = "ingestion_logs"
     
@@ -476,7 +492,7 @@ class IngestionLog(Base):
     start_time = Column(DateTime, default=datetime.utcnow, nullable=False)
     end_time = Column(DateTime)
     error_message = Column(Text)
-    metadata = Column(JSONB)
+    operation_metadata = Column(JSONType)  # Renamed from 'metadata' to avoid SQLAlchemy reserved word
     
     __table_args__ = (
         Index('idx_ingestion_type', 'operation_type'),
