@@ -4,12 +4,27 @@
 requests>=2.31.0
 urllib3>=2.0.0
 
+# Database support
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.23
+alembic>=1.13.0
+
+# OpenStates and Congressional data
+pyopenstates>=3.2.0
+bicam>=0.1.0
+
 # For testing
 pytest>=7.4.0
 pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
 
 # For data validation
 jsonschema>=4.19.0
+pydantic>=2.5.0
 
 # For logging
 colorlog>=6.7.0
+python-dotenv>=1.0.0
+
+# Progress tracking
+tqdm>=4.66.0
