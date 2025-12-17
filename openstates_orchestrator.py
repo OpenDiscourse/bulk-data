@@ -81,7 +81,9 @@ class OpenStatesOrchestrator:
         self.worker_pool = WorkerPool(num_workers=num_workers)
         self.coordinator = DistributedIngestionCoordinator(self.worker_pool)
         
-        # Initialize scraper runner
+        # Initialize scraper runner (Note: This is a stub implementation that requires
+        # the openstates-scrapers package to be properly configured. It provides hooks
+        # for integrating with the scraper execution but is not fully implemented yet.)
         self.scraper_runner = OpenStatesScraperRunner()
         
         logger.info(f"OpenStates Orchestrator initialized with {num_workers} workers")

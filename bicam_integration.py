@@ -10,12 +10,12 @@ from typing import Dict, List, Optional, Any
 from pathlib import Path
 import pandas as pd
 
+# Check BICAM availability without logging immediately
 try:
     import bicam
     BICAM_AVAILABLE = True
 except ImportError:
     BICAM_AVAILABLE = False
-    logging.warning("BICAM library not installed. Install with: pip install bicam")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -55,12 +55,17 @@ class BICAMDataManager:
         
         Args:
             cache_dir: Directory for caching datasets (None for default)
+            
+        Raises:
+            ImportError: If BICAM library is not installed
         """
         if not BICAM_AVAILABLE:
-            raise ImportError(
+            error_msg = (
                 "BICAM library is not installed. "
                 "Install it with: pip install bicam"
             )
+            logger.warning(error_msg)
+            raise ImportError(error_msg)
         
         self.cache_dir = Path(cache_dir) if cache_dir else None
         self.datasets_info = {}
